@@ -35,7 +35,7 @@ for (int index = 0; index < MAX_CHAR_LEN; index++){
   ValidEntry = false;
 }
 //Function Initializers
-void readCarData(ifstream &inFile, CarType CarList[]);
+int readCarData(ifstream &inFile, CarType CarList[]);
 CarType readCar(ifstream &inFile);
 void printCarData(CarType CarList[], int carChoice);
 void printByOrigin(CarType CarList[], char userOrigin[]);
@@ -69,12 +69,13 @@ CarType readCar(ifstream &inFile){
     return car;
 }
 //Read Car Data
-void readCarData(ifstream &inFile, CarType CarList[]){
+int readCarData(ifstream &inFile, CarType CarList[]){
 int numCars = 0;
     while(inFile.peek() != EOF && numCars < MAX_CARS) {
         CarList[numCars] = readCar(inFile);
         numCars++;
     }
+    return numCars;
 }
 //Integer Check
 int readInt(const char prompt[]){
@@ -107,13 +108,14 @@ double readDouble(const char prompt[]){
 
 
 //Adding Car
-void addCar(CarType CarList[]){
+void addCar(CarType CarList[], int carSize){
   //Finding first available entry
   for (int i = 0; i < 500; i++){
     if (CarList[i].ValidEntry == false){
       cout << "Entering  information for Car #" << i << endl;
       cout << "Enter  Name: ";
-      cin >> CarList[i].Name;
+      cin.ignore(100, '\n');
+      cin.getline(CarList[i].Name, carSize);
       //Entering into double/int checker
       CarList[i].MPG = readDouble("Enter MPG: ");
       CarList[i].Cylinders = readInt("Enter Cylinders: ");
@@ -123,7 +125,8 @@ void addCar(CarType CarList[]){
       CarList[i].Acceleration = readDouble("Enter Acceleration: ");
       CarList[i].Model = readInt("Enter Model: ");
       cout << "Enter Origin: ";
-      cin >> CarList[i].Origin;
+      cin.ignore(100, '\n');
+      cin.getline(CarList[i].Origin,carSize);
       CarList[i].ValidEntry = true;
       cout << endl;
       break;
@@ -183,7 +186,7 @@ int main(){
 CarType CarList[MAX_CARS];
 ifstream CarFile("cars.txt");
 //Filling in the array
-readCarData(CarFile, CarList);
+int carCounter = readCarData(CarFile, CarList);
 int choice = 0;
 //Menu
 while (choice!=5){
@@ -207,7 +210,7 @@ while (choice!=5){
   }
   //Add Car
   else if (choice==2){
-    addCar(CarList);
+    addCar(CarList, carCounter);
   }
   //Remove Car
   else if (choice==3){
